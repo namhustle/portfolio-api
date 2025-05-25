@@ -20,7 +20,6 @@ export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
       user.hashedPassword &&
       bcrypt.compareSync(password, user.hashedPassword)
     ) {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { hashedPassword, ...safeUser } = user.toJSON()
 
       return safeUser

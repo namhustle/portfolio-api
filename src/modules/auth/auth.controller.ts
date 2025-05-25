@@ -12,7 +12,7 @@ import { AuthService } from './auth.service'
 import { LocalLoginDto, LocalRegisterDto, RefreshTokenDto } from './dtos'
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { Public } from './decorators'
-import { GoogleAuthGuard, LocalAuthGuard } from './guards'
+import { FacebookAuthGuard, GoogleAuthGuard, LocalAuthGuard } from './guards'
 import { Request } from 'express'
 //import { ApiVersioned } from '../../common/decorators'
 
@@ -86,6 +86,23 @@ export class AuthController {
   async googleAuthCallback(@Req() req: Request) {
     return {
       message: 'Google login successfully',
+      data: await this.authService.login(req.user),
+    }
+  }
+
+  @Get('/facebook')
+  @Public()
+  @ApiOperation({ summary: 'Facebook OAuth Login' })
+  @UseGuards(FacebookAuthGuard)
+  async facebookAuth() {}
+
+  @Get('/facebook/callback')
+  @Public()
+  @ApiOperation({ summary: 'Facebook OAuth Callback' })
+  @UseGuards(FacebookAuthGuard)
+  async facebookAuthCallback(@Req() req: Request) {
+    return {
+      message: 'Facebook login successfully',
       data: await this.authService.login(req.user),
     }
   }

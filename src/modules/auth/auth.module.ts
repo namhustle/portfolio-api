@@ -5,7 +5,12 @@ import { JwtModule } from '@nestjs/jwt'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { PassportModule } from '@nestjs/passport'
 import { UserModule } from '../users/user.module'
-import { GoogleStrategy, JwtStrategy, LocalStrategy } from './strategies'
+import {
+  FacebookStrategy,
+  GoogleStrategy,
+  JwtStrategy,
+  LocalStrategy,
+} from './strategies'
 import { ACCESS_TOKEN_EXPIRES_IN } from '../../common/constants'
 
 @Global()
@@ -27,6 +32,12 @@ import { ACCESS_TOKEN_EXPIRES_IN } from '../../common/constants'
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, LocalStrategy, JwtStrategy, GoogleStrategy],
+  providers: [
+    AuthService,
+    LocalStrategy,
+    JwtStrategy,
+    GoogleStrategy,
+    FacebookStrategy,
+  ],
 })
 export class AuthModule {}

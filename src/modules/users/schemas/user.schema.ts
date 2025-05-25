@@ -24,6 +24,9 @@ export class User {
   @Prop({ type: String, required: false, unique: true, sparse: true })
   googleId?: string
 
+  @Prop({ type: String, required: false, unique: true, sparse: true })
+  facebookId?: string
+
   @Prop({ type: String, required: false })
   avatar?: string
 
