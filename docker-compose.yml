@@ -1,0 +1,51 @@
+networks:
+  template_network:
+    name: template_network
+    driver: bridge
+
+services:
+  template_mongo:
+    image: mongo:latest
+    container_name: template_mongo
+    restart: always
+    ports:
+      - "27017:27017"
+    volumes:
+      - template_mongo:/data
+    networks:
+      - template_network
+
+  template_redis:
+    image: redis:latest
+    container_name: template_redis
+    restart: always
+    ports:
+      - "6379:6379"
+    volumes:
+      - template_redis:/data
+    networks:
+      - template_network
+
+  template_api:
+    build: .
+    image: template_api:v0.0.1
+    container_name: template_api
+    restart: always
+    env_file:
+      - ./.env
+    environment:
+      - MONGO_URI=mongodb://template_mongo:27017/template
+      - REDIS_URI=redis://template_redis_server:6379
+      - JWT_ACCESS_SECRET=${JWT_ACCESS_SECRET}
+      - JWT_REFRESH_SECRET=${JWT_REFRESH_SECRET}
+    ports:
+      - "3000:3000"
+    networks:
+      - template_network
+    depends_on:
+      - template_mongo
+      - template_redis
+
+volumes:
+  template_mongo:
+  template_redis:
