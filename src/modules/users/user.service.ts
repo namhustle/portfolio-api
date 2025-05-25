@@ -55,17 +55,9 @@ export class UserService {
     filter: FilterQuery<User>,
     payload: Partial<Omit<User, '_id'>>,
   ) {
-    return this.userModel.findOneAndUpdate(
-      {
-        filter,
-      },
-      {
-        ...payload,
-      },
-      {
-        new: true,
-      },
-    )
+    return this.userModel.findOneAndUpdate(filter, payload, {
+      new: true,
+    })
   }
 
   async deleteOne(filter: FilterQuery<User>) {

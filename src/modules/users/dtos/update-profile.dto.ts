@@ -1,6 +1,14 @@
 import { ApiPropertyOptional } from '@nestjs/swagger'
-import { IsEnum, IsOptional, IsString, Length, Matches } from 'class-validator'
+import {
+  IsBoolean,
+  IsEnum,
+  IsOptional,
+  IsString,
+  Length,
+  Matches,
+} from 'class-validator'
 import { UserGender } from '../enums'
+import { Transform } from 'class-transformer'
 
 export class UpdateProfileDto {
   @ApiPropertyOptional({
@@ -34,4 +42,13 @@ export class UpdateProfileDto {
   })
   @IsOptional()
   gender?: UserGender
+
+  @ApiPropertyOptional({
+    type: String,
+    description: 'Set to true to remove the current avatar',
+    example: false,
+  })
+  @IsBoolean()
+  @IsOptional()
+  removeAvatar?: boolean
 }

@@ -20,6 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.817.0",
+    "@aws-sdk/s3-request-presigner": "^3.817.0",
     "@keyv/redis": "^4.4.0",
     "@nestjs/cache-manager": "^3.0.1",
     "@nestjs/common": "^11.0.1",
@@ -59,6 +61,7 @@
     "@types/bcrypt": "^5.0.2",
     "@types/express": "^5.0.0",
     "@types/jest": "^29.5.14",
+    "@types/multer": "^1.4.12",
     "@types/node": "^22.10.7",
     "@types/passport-facebook": "^3.0.3",
     "@types/passport-google-oauth20": "^2.0.16",

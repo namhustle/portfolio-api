@@ -8,6 +8,7 @@ import { JwtAuthGuard } from './modules/auth/guards'
 import { createKeyv } from '@keyv/redis'
 import { Keyv } from 'keyv'
 import { CacheableMemory } from 'cacheable'
+import { AwsS3Module } from './modules/aws-s3/aws-s3.module'
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { CacheableMemory } from 'cacheable'
       inject: [ConfigService],
     }),
     DbModule,
+    AwsS3Module,
     UserModule,
     AuthModule,
   ],
