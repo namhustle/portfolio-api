@@ -8,7 +8,6 @@ import {
   Matches,
 } from 'class-validator'
 import { UserGender } from '../enums'
-import { Transform } from 'class-transformer'
 
 export class UpdateProfileDto {
   @ApiPropertyOptional({

@@ -55,6 +55,16 @@ export class UserService {
     filter: FilterQuery<User>,
     payload: Partial<Omit<User, '_id'>>,
   ) {
+    if (payload.username) {
+      const existing = await this.exists({ username: payload.username })
+      if (existing) throw new Error('Username already exists')
+    }
+
+    if (payload.email) {
+      const existing = await this.exists({ email: payload.email })
+      if (existing) throw new Error('Email already exists')
+    }
+
     return this.userModel.findOneAndUpdate(filter, payload, {
       new: true,
     })

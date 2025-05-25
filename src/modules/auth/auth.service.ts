@@ -30,9 +30,9 @@ export class AuthService {
 
   async localRegister(payload: LocalRegisterDto) {
     const existingUser = await this.userService.exists({
-      username: payload.username,
+      email: payload.email,
     })
-    if (existingUser) throw new ConflictException('Username already exists')
+    if (existingUser) throw new ConflictException('Email already exists')
     const { password, ...subPayload } = payload
     const user = await this.userService.create({
       hashedPassword: bcrypt.hashSync(password, 10),

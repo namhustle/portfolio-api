@@ -7,12 +7,12 @@ import * as bcrypt from 'bcrypt'
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy, 'local') {
   constructor(private userService: UserService) {
-    super()
+    super({ usernameField: 'email' })
   }
 
-  async validate(username: string, password: string): Promise<any> {
+  async validate(email: string, password: string): Promise<any> {
     const user = await this.userService.findOne(
-      { username },
+      { email },
       { select: '+hashedPassword' },
     )
     if (
