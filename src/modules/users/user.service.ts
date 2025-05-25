@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose'
 import { User, UserDocument } from './schemas'
 import { FilterQuery, PaginateModel, PaginateOptions } from 'mongoose'
 import { QueryUserDto } from './dtos'
+import { UserRole } from './enums'
 
 @Injectable()
 export class UserService {
@@ -11,6 +12,11 @@ export class UserService {
   ) {}
 
   async create(payload: Omit<User, '_id'>) {
+    const userCount = await this.userModel.countDocuments({})
+    if (userCount === 0) {
+      payload.roles = [UserRole.ADMIN]
+    }
+
     return this.userModel.create(payload)
   }
 
