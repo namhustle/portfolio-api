@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   NotFoundException,
   Post,
   Req,
@@ -11,7 +12,7 @@ import { AuthService } from './auth.service'
 import { LocalLoginDto, LocalRegisterDto, RefreshTokenDto } from './dtos'
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
 import { Public } from './decorators'
-import { LocalAuthGuard } from './guards'
+import { GoogleAuthGuard, LocalAuthGuard } from './guards'
 import { Request } from 'express'
 //import { ApiVersioned } from '../../common/decorators'
 
@@ -40,7 +41,7 @@ export class AuthController {
   async localLogin(@Body() payload: LocalLoginDto, @Req() req: Request) {
     return {
       message: 'Login successfully',
-      data: await this.authService.localLogin(req.user),
+      data: await this.authService.login(req.user),
     }
   }
 
@@ -69,6 +70,23 @@ export class AuthController {
 
     return {
       message: 'Logout successfully',
+    }
+  }
+
+  @Get('/google')
+  @Public()
+  @ApiOperation({ summary: 'Google OAuth Login' })
+  @UseGuards(GoogleAuthGuard)
+  async googleAuth() {}
+
+  @Get('/google/callback')
+  @Public()
+  @ApiOperation({ summary: 'Google OAuth Callback' })
+  @UseGuards(GoogleAuthGuard)
+  async googleAuthCallback(@Req() req: Request) {
+    return {
+      message: 'Google login successfully',
+      data: await this.authService.login(req.user),
     }
   }
 }

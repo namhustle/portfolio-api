@@ -79,7 +79,7 @@ export class AuthService {
     }
   }
 
-  async localLogin(user: Express.User | undefined): Promise<TokenResponse> {
+  async login(user: Express.User | undefined): Promise<TokenResponse> {
     const userDoc = user as unknown as UserDocument
     if (!userDoc._id || !userDoc.fullName || !userDoc.roles) {
       throw new UnauthorizedException('Invalid user data')

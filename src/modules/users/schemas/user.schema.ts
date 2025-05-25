@@ -18,6 +18,15 @@ export class User {
   @Prop({ type: String, required: false, select: false })
   hashedPassword?: string
 
+  @Prop({ type: String, required: false, unique: true, sparse: true })
+  email?: string
+
+  @Prop({ type: String, required: false, unique: true, sparse: true })
+  googleId?: string
+
+  @Prop({ type: String, required: false })
+  avatar?: string
+
   @Prop({ type: String, enum: UserGender, required: false })
   gender?: UserGender
 

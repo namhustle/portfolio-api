@@ -53,7 +53,7 @@ async function bootstrap() {
 
   // Open APIs
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('Nestjs template APIs')
+    .setTitle('Portfolio APIs')
     .setVersion('1')
     .addServer(
       `http://localhost:${config.get('PORT')}`,
@@ -84,7 +84,7 @@ async function bootstrap() {
   })
 
   SwaggerModule.setup('docs', app, document, {
-    customSiteTitle: 'Template NestJS API Documentation',
+    customSiteTitle: 'Portfolio API Documentation',
     customCss: '.swagger-ui .topbar { display: none }',
     swaggerOptions: {
       persistAuthorization: true,
