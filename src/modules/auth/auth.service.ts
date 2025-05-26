@@ -15,12 +15,12 @@ import { Cache } from 'cache-manager'
 import { TokenPayload, TokenResponse } from './interfaces/token.interface'
 import { UserRole } from '../users/enums'
 import { ConfigService } from '@nestjs/config'
-import { v4 } from 'uuid'
 import {
-  ACCESS_TOKEN_EXPIRES_IN,
   ACCESS_TOKEN_EXPIRES_IN_SECONDS,
   REFRESH_TOKEN_EXPIRES_IN,
 } from '../../common/constants'
+import { Request } from 'express'
+import { SessionService } from '../sessions/session.service'
 
 @Injectable()
 export class AuthService {
@@ -31,6 +31,7 @@ export class AuthService {
     private readonly configService: ConfigService,
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly sessionService: SessionService,
   ) {}
 
   async localRegister(payload: LocalRegisterDto) {
@@ -50,14 +51,16 @@ export class AuthService {
   async validateToken(token: string): Promise<boolean> {
     try {
       const payload: TokenPayload | null = this.jwtService.decode(token)
-      if (!payload?.jti || !payload?.sub) {
-        this.logger.error('Invalid token payload: missing jti or sub')
+      if (!payload?.sessionId || !payload?.sub) {
+        this.logger.error('Invalid token payload: missing sessionId or sub')
         return false
       }
 
       // Check if token is blacklisted
-      if (await this.cacheManager.get(`token_blacklist:${payload.jti}`)) {
-        this.logger.warn(`Token with jti ${payload.jti} is blacklisted`)
+      if (await this.cacheManager.get(`token_blacklist:${payload.sessionId}`)) {
+        this.logger.warn(
+          `Token with sessionId ${payload.sessionId} is blacklisted`,
+        )
         return false
       }
 
@@ -84,16 +87,19 @@ export class AuthService {
     }
   }
 
-  async login(user: Express.User | undefined): Promise<TokenResponse> {
-    const userDoc = user as unknown as UserDocument
+  async login(req: Request): Promise<TokenResponse> {
+    const userDoc = req.user as unknown as UserDocument
     if (!userDoc._id || !userDoc.fullName || !userDoc.roles) {
       throw new UnauthorizedException('Invalid user data')
     }
+
+    const session = await this.sessionService.create(req)
 
     return this.generateTokens(
       userDoc._id.toString(),
       userDoc.fullName,
       userDoc.roles || [],
+      session._id.toString(),
     )
   }
 
@@ -136,16 +142,17 @@ export class AuthService {
           secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
         },
       )
-      const { sub, jti, exp } = payload as TokenPayload
+      const { sub, sessionId, exp } = payload as TokenPayload
       const user = await this.userService.findOne({ _id: sub })
       if (!user) throw new NotFoundException('User not found')
 
-      await this.revokeToken(jti, exp)
+      await this.revokeToken(sessionId, exp)
 
       return this.generateTokens(
         user._id.toString(),
         user.fullName,
         user.roles || [],
+        sessionId,
       )
     } catch (error: unknown) {
       const errorMessage =
@@ -162,8 +169,9 @@ export class AuthService {
       await this.jwtService.decode(refreshToken)
 
     await Promise.all([
-      this.revokeToken(accessTokenPayload.jti, accessTokenPayload.exp),
-      this.revokeToken(refreshTokenPayload.jti, refreshTokenPayload.exp),
+      this.revokeToken(accessTokenPayload.sessionId, accessTokenPayload.exp),
+      this.revokeToken(refreshTokenPayload.sessionId, refreshTokenPayload.exp),
+      this.sessionService.deleteOne({ _id: accessTokenPayload.sessionId }),
     ])
   }
 
@@ -171,15 +179,16 @@ export class AuthService {
     userId: string,
     fullName: string,
     roles: UserRole[],
+    sessionId: string,
   ): Promise<TokenResponse> {
     try {
       const [accessToken, refreshToken] = await Promise.all([
         this.jwtService.sign(
           {
             sub: userId,
-            jti: v4(),
-            fullName,
-            roles,
+            sessionId: sessionId,
+            fullName: fullName,
+            roles: roles,
           },
           {
             secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
@@ -188,7 +197,7 @@ export class AuthService {
         this.jwtService.sign(
           {
             sub: userId,
-            jti: v4(),
+            sessionId: sessionId,
           },
           {
             secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
@@ -211,14 +220,14 @@ export class AuthService {
     }
   }
 
-  private async revokeToken(jti: string, exp: number): Promise<void> {
+  private async revokeToken(sessionId: string, exp: number): Promise<void> {
     try {
       // Calculate TTL based on token expiration
       const now = Math.floor(Date.now() / 1000)
       const ttl = Math.max(exp - now, 0) * 1000
 
       // Add token to blacklist
-      await this.cacheManager.set(`token_blacklist:${jti}`, true, ttl)
+      await this.cacheManager.set(`token_blacklist:${sessionId}`, true, ttl)
     } catch (error: unknown) {
       const errorMessage =
         error instanceof Error ? error.message : String(error)

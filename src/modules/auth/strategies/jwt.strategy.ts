@@ -23,8 +23,8 @@ export class JwtStrategy extends PassportStrategy(Strategy, 'jwt') {
 
   async validate(request: any, payload: AuthPayload) {
     // Validate payload structure
-    if (!payload.sub || !payload.jti) {
-      this.logger.error('Invalid token payload: missing sub or jti')
+    if (!payload.sub || !payload.sessionId) {
+      this.logger.error('Invalid token payload: missing sub or sessionId')
       throw new UnauthorizedException('Invalid token payload')
     }
 

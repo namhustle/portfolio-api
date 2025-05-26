@@ -7,7 +7,7 @@ export interface TokenResponse {
 
 export interface TokenPayload {
   sub: string
-  jti: string
+  sessionId: string
   fullName?: string
   roles: UserRole[]
   iat: number

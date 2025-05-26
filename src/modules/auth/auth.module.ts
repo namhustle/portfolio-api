@@ -12,6 +12,7 @@ import {
   LocalStrategy,
 } from './strategies'
 import { ACCESS_TOKEN_EXPIRES_IN } from '../../common/constants'
+import { SessionModule } from '../sessions/session.module'
 
 @Global()
 @Module({
@@ -30,6 +31,7 @@ import { ACCESS_TOKEN_EXPIRES_IN } from '../../common/constants'
       },
       inject: [ConfigService],
     }),
+    SessionModule,
   ],
   controllers: [AuthController],
   providers: [

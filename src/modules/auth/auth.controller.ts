@@ -47,7 +47,7 @@ export class AuthController {
   async localLogin(@Body() payload: LocalLoginDto, @Req() req: Request) {
     return {
       message: 'Login successfully',
-      data: await this.authService.login(req.user),
+      data: await this.authService.login(req),
     }
   }
 
@@ -109,7 +109,7 @@ export class AuthController {
   async googleAuthCallback(@Req() req: Request) {
     return {
       message: 'Google login successfully',
-      data: await this.authService.login(req.user),
+      data: await this.authService.login(req),
     }
   }
 
@@ -126,7 +126,7 @@ export class AuthController {
   async facebookAuthCallback(@Req() req: Request) {
     return {
       message: 'Facebook login successfully',
-      data: await this.authService.login(req.user),
+      data: await this.authService.login(req),
     }
   }
 }
