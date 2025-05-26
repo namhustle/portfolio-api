@@ -3,6 +3,7 @@ import {
   Inject,
   Injectable,
   Logger,
+  NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common'
 import { LocalRegisterDto } from './dtos'
@@ -15,7 +16,11 @@ import { TokenPayload, TokenResponse } from './interfaces/token.interface'
 import { UserRole } from '../users/enums'
 import { ConfigService } from '@nestjs/config'
 import { v4 } from 'uuid'
-import { REFRESH_TOKEN_EXPIRES_IN } from '../../common/constants'
+import {
+  ACCESS_TOKEN_EXPIRES_IN,
+  ACCESS_TOKEN_EXPIRES_IN_SECONDS,
+  REFRESH_TOKEN_EXPIRES_IN,
+} from '../../common/constants'
 
 @Injectable()
 export class AuthService {
@@ -92,6 +97,37 @@ export class AuthService {
     )
   }
 
+  async changePassword(
+    userId: string,
+    currentPassword: string,
+    newPassword: string,
+  ) {
+    const user = await this.userService.findOne(
+      { _id: userId },
+      { select: '+hashedPassword' },
+    )
+
+    if (!user?.hashedPassword) {
+      throw new NotFoundException('User not found')
+    }
+
+    if (!bcrypt.compareSync(currentPassword, user.hashedPassword)) {
+      throw new UnauthorizedException('Invalid credentials')
+    }
+
+    await this.userService.findOneAndUpdate(
+      { _id: userId },
+      { hashedPassword: bcrypt.hashSync(newPassword, 10) },
+    )
+
+    const now = Math.floor(Date.now() / 1000)
+    await this.cacheManager.set(
+      `token_iat_available:${userId}`,
+      now,
+      ACCESS_TOKEN_EXPIRES_IN_SECONDS * 1000,
+    )
+  }
+
   async refreshToken(refreshToken: string): Promise<TokenResponse> {
     try {
       const payload: TokenPayload | object = this.jwtService.verify(
@@ -102,7 +138,7 @@ export class AuthService {
       )
       const { sub, jti, exp } = payload as TokenPayload
       const user = await this.userService.findOne({ _id: sub })
-      if (!user) throw new Error('User not found')
+      if (!user) throw new NotFoundException('User not found')
 
       await this.revokeToken(jti, exp)
 

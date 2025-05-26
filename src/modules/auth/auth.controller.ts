@@ -9,11 +9,17 @@ import {
   // Version,
 } from '@nestjs/common'
 import { AuthService } from './auth.service'
-import { LocalLoginDto, LocalRegisterDto, RefreshTokenDto } from './dtos'
+import {
+  ChangePasswordDto,
+  LocalLoginDto,
+  LocalRegisterDto,
+  RefreshTokenDto,
+} from './dtos'
 import { ApiBearerAuth, ApiOperation, ApiTags } from '@nestjs/swagger'
-import { Public } from './decorators'
+import { AuthUser, Public } from './decorators'
 import { FacebookAuthGuard, GoogleAuthGuard, LocalAuthGuard } from './guards'
 import { Request } from 'express'
+import { AuthPayload } from './types'
 //import { ApiVersioned } from '../../common/decorators'
 
 @Controller('auth')
@@ -70,6 +76,23 @@ export class AuthController {
 
     return {
       message: 'Logout successfully',
+    }
+  }
+
+  @Post('/change-password')
+  @ApiOperation({ summary: 'Change Password' })
+  async changePassword(
+    @AuthUser() authUser: AuthPayload,
+    @Body() payload: ChangePasswordDto,
+  ) {
+    await this.authService.changePassword(
+      authUser.sub,
+      payload.currentPassword,
+      payload.newPassword,
+    )
+
+    return {
+      message: 'Change password successfully',
     }
   }
 
