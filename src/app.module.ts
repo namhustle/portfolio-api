@@ -9,6 +9,7 @@ import { createKeyv } from '@keyv/redis'
 import { Keyv } from 'keyv'
 import { CacheableMemory } from 'cacheable'
 import { AwsS3Module } from './modules/aws-s3/aws-s3.module'
+import { SessionModule } from './modules/sessions/session.module'
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { AwsS3Module } from './modules/aws-s3/aws-s3.module'
     AwsS3Module,
     UserModule,
     AuthModule,
+    SessionModule,
   ],
   controllers: [],
   providers: [

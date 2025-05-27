@@ -1,12 +1,13 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Session, SessionDocument } from './schemas'
-import { FilterQuery, PaginateModel } from 'mongoose'
+import { FilterQuery, PaginateModel, PaginateOptions } from 'mongoose'
 import { DeviceInfo } from './types'
 import { UAParser } from 'ua-parser-js'
 import { Request } from 'express'
 import { UserDocument } from '../users/schemas'
 import { REFRESH_TOKEN_EXPIRES_IN_SECONDS } from '../../common/constants'
+import { QuerySessionDto } from './dtos'
 
 @Injectable()
 export class SessionService {
@@ -38,6 +39,18 @@ export class SessionService {
     }
   }
 
+  async paginate(query: QuerySessionDto) {
+    const filter: FilterQuery<Session> = {}
+
+    const options: PaginateOptions = {
+      page: query.page,
+      limit: query.limit,
+      sort: query.getSortObject(),
+    }
+
+    return this.sessionModel.paginate(filter, options)
+  }
+
   async create(req: Request) {
     const user = req.user as unknown as UserDocument
     const deviceInfo = this.extractDeviceInfo(req)
@@ -47,6 +60,14 @@ export class SessionService {
       deviceInfo,
       expiresAt: new Date(Date.now() + REFRESH_TOKEN_EXPIRES_IN_SECONDS * 1000),
     })
+  }
+
+  async findById(sessionId: string) {
+    return this.sessionModel.findById(sessionId)
+  }
+
+  async findOne(filter: FilterQuery<Session>) {
+    return this.sessionModel.findOne(filter)
   }
 
   async findOneAndUpdateOne(
