@@ -1,15 +1,15 @@
 import { UserRole } from '../../users/enums'
 
-export interface TokenResponse {
+export type TokenResponse = {
   access_token: string
   refresh_token: string
 }
 
-export interface TokenPayload {
+export type TokenPayload = {
   sub: string
-  sessionId: string
-  fullName?: string
   roles: UserRole[]
+  sessionId: string
+  jti: string
   iat: number
   exp: number
 }

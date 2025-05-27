@@ -49,6 +49,13 @@ export class SessionService {
     })
   }
 
+  async findOneAndUpdateOne(
+    filter: FilterQuery<Session>,
+    payload: Partial<Omit<Session, '_id'>>,
+  ) {
+    return this.sessionModel.findOneAndUpdate(filter, payload, { new: true })
+  }
+
   async deleteOne(filter: FilterQuery<Session>) {
     return this.sessionModel.deleteOne(filter)
   }
