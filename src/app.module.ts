@@ -11,6 +11,7 @@ import { CacheableMemory } from 'cacheable'
 import { AwsS3Module } from './modules/aws-s3/aws-s3.module'
 import { SessionModule } from './modules/sessions/session.module'
 import { CategoryModule } from './modules/categories/category.module'
+import { TagModule } from './modules/tags/tag.module'
 
 @Module({
   imports: [
@@ -37,6 +38,7 @@ import { CategoryModule } from './modules/categories/category.module'
     AuthModule,
     SessionModule,
     CategoryModule,
+    TagModule,
   ],
   controllers: [],
   providers: [
