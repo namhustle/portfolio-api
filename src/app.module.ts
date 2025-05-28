@@ -12,6 +12,7 @@ import { AwsS3Module } from './modules/aws-s3/aws-s3.module'
 import { SessionModule } from './modules/sessions/session.module'
 import { CategoryModule } from './modules/categories/category.module'
 import { TagModule } from './modules/tags/tag.module'
+import { ArticleModule } from './modules/articles/article.module'
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { TagModule } from './modules/tags/tag.module'
     SessionModule,
     CategoryModule,
     TagModule,
+    ArticleModule,
   ],
   controllers: [],
   providers: [
