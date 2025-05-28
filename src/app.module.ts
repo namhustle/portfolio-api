@@ -10,6 +10,7 @@ import { Keyv } from 'keyv'
 import { CacheableMemory } from 'cacheable'
 import { AwsS3Module } from './modules/aws-s3/aws-s3.module'
 import { SessionModule } from './modules/sessions/session.module'
+import { CategoryModule } from './modules/categories/category.module'
 
 @Module({
   imports: [
@@ -35,6 +36,7 @@ import { SessionModule } from './modules/sessions/session.module'
     UserModule,
     AuthModule,
     SessionModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [
