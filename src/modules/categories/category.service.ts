@@ -1,7 +1,12 @@
 import { Injectable } from '@nestjs/common'
 import { InjectModel } from '@nestjs/mongoose'
 import { Category, CategoryDocument } from './schemas'
-import { FilterQuery, PaginateModel, PaginateOptions, QueryOptions } from 'mongoose'
+import {
+  FilterQuery,
+  PaginateModel,
+  PaginateOptions,
+  QueryOptions,
+} from 'mongoose'
 import { QueryCategoryDto } from './dtos'
 
 @Injectable()

@@ -39,7 +39,7 @@ export class UserController {
   @ApiOperation({ summary: 'Get list of users' })
   async paginateUsers(@Query() query: QueryUserDto) {
     const pagination = await this.userService.paginate(query)
-    
+
     return {
       message: 'List of users found',
       data: pagination.docs,
